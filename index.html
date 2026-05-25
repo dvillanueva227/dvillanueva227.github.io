@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dylan Villanueva — Data Analyst</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { background: #060d1f; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; }
+    #canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+    .layout { display: flex; min-height: 100vh; position: relative; z-index: 1; }
+    .sidebar { width: 220px; background: rgba(6,13,31,0.97); border-right: 1px solid rgba(99,179,237,0.15); padding: 2rem 1.5rem; position: fixed; top: 0; left: 0; height: 100vh; display: flex; flex-direction: column; overflow-y: auto; z-index: 10; }
+    .sidebar-name { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .sidebar-title { font-size: 12px; color: #63b3ed; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2rem; }
+    .nav-link { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 6px; color: #94a3b8; font-size: 13px; cursor: pointer; margin-bottom: 4px; transition: all 0.2s; text-decoration: none; }
+    .nav-link:hover, .nav-link.active { background: rgba(99,179,237,0.1); color: #63b3ed; }
+    .nav-dot { width: 5px; height: 5px; border-radius: 50%; background: #63b3ed; opacity: 0.5; flex-shrink: 0; }
+    .nav-link.active .nav-dot { opacity: 1; }
+    .sidebar-socials { margin-top: auto; display: flex; gap: 12px; padding-top: 1rem; border-top: 1px solid rgba(99,179,237,0.15); }
+    .social-link { font-size: 12px; color: #63b3ed; text-decoration: none; opacity: 0.8; }
+    .social-link:hover { opacity: 1; }
+    .main { margin-left: 220px; flex: 1; }
+    section { padding: 5rem 4rem; border-bottom: 1px solid rgba(99,179,237,0.08); }
+    #home { min-height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; }
+    .available-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(72,187,120,0.15); border: 1px solid rgba(72,187,120,0.4); color: #68d391; font-size: 12px; padding: 4px 14px; border-radius: 20px; margin-bottom: 1.5rem; }
+    .badge-dot { width: 7px; height: 7px; border-radius: 50%; background: #68d391; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .hero-avatar { font-size: 80px; margin-bottom: 1rem; }
+    .hero-name { font-size: 52px; font-weight: 800; color: #fff; margin-bottom: 0.5rem; }
+    .hero-tagline { font-size: 32px; font-weight: 600; color: #63b3ed; font-style: italic; margin-bottom: 2rem; }
+    .hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary { background: #63b3ed; color: #060d1f; padding: 10px 24px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; text-decoration: none; }
+    .btn-outline { background: transparent; color: #63b3ed; border: 1px solid #63b3ed; padding: 10px 24px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; transition: background 0.2s; }
+    .btn-outline:hover { background: rgba(99,179,237,0.1); }
+    .section-label { font-size: 11px; color: #63b3ed; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 0.5rem; }
+    .section-title { font-size: 36px; font-weight: 800; color: #fff; margin-bottom: 2rem; }
+    .impact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; }
+    .impact-card { background: rgba(99,179,237,0.07); border: 1px solid rgba(99,179,237,0.2); border-radius: 12px; padding: 1.5rem; text-align: center; }
+    .impact-icon { font-size: 28px; margin-bottom: 0.75rem; }
+    .impact-num { font-size: 32px; font-weight: 800; color: #fff; }
+    .impact-label { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+    .about-text { font-size: 15px; color: #cbd5e0; line-height: 1.8; max-width: 700px; }
+    .about-text p { margin-bottom: 1rem; }
+    .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+    .skill-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(99,179,237,0.15); border-radius: 12px; padding: 1.25rem; }
+    .skill-card-title { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+    .skill-card-desc { font-size: 11px; color: #718096; margin-bottom: 10px; line-height: 1.5; }
+    .skill-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+    .tag { background: rgba(99,179,237,0.12); color: #63b3ed; font-size: 10px; padding: 2px 8px; border-radius: 10px; border: 1px solid rgba(99,179,237,0.25); }
+    .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+    .project-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(99,179,237,0.15); border-radius: 12px; overflow: hidden; transition: border-color 0.2s; }
+    .project-card:hover { border-color: rgba(99,179,237,0.5); }
+    .project-img { width: 100%; height: 140px; display: flex; align-items: center; justify-content: center; font-size: 48px; }
+    .project-body { padding: 1rem; }
+    .project-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+    .project-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+    .project-desc { font-size: 12px; color: #94a3b8; line-height: 1.6; margin-bottom: 10px; }
+    .open-repo { font-size: 11px; color: #63b3ed; border: 1px solid rgba(99,179,237,0.4); background: transparent; padding: 5px 12px; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block; }
+    .open-repo:hover { background: rgba(99,179,237,0.1); }
+    .timeline { position: relative; padding-left: 24px; }
+    .timeline::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: rgba(99,179,237,0.3); }
+    .timeline-item { position: relative; margin-bottom: 2rem; }
+    .timeline-dot { position: absolute; left: -29px; top: 6px; width: 10px; height: 10px; border-radius: 50%; background: #63b3ed; border: 2px solid #060d1f; }
+    .timeline-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(99,179,237,0.15); border-radius: 10px; padding: 1.25rem; }
+    .timeline-role { font-size: 15px; font-weight: 700; color: #fff; }
+    .timeline-company { font-size: 13px; color: #94a3b8; margin-top: 2px; }
+    .timeline-date { display: inline-block; background: rgba(72,187,120,0.15); color: #68d391; font-size: 11px; padding: 2px 10px; border-radius: 10px; margin: 6px 0 10px; }
+    .timeline-bullets { list-style: disc; padding-left: 1.2rem; }
+    .timeline-bullets li { font-size: 13px; color: #94a3b8; margin-bottom: 4px; line-height: 1.6; }
+    .contact-text { font-size: 15px; color: #94a3b8; margin-bottom: 2rem; max-width: 500px; }
+    .contact-links { display: flex; gap: 16px; flex-wrap: wrap; }
+    .contact-btn { display: inline-flex; align-items: center; gap: 8px; background: rgba(99,179,237,0.1); border: 1px solid rgba(99,179,237,0.35); color: #63b3ed; padding: 10px 22px; border-radius: 8px; font-size: 14px; text-decoration: none; transition: background 0.2s; }
+    .contact-btn:hover { background: rgba(99,179,237,0.2); }
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; }
+      section { padding: 3rem 1.5rem; }
+      .hero-name { font-size: 32px; }
+      .hero-tagline { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-name">Dylan Villanueva</div>
+    <div class="sidebar-title">Data Analyst</div>
+    <nav>
+      <a class="nav-link active" href="#home"><span class="nav-dot"></span> Home</a>
+      <a class="nav-link" href="#impact"><span class="nav-dot"></span> Impact</a>
+      <a class="nav-link" href="#about"><span class="nav-dot"></span> About</a>
+      <a class="nav-link" href="#skills"><span class="nav-dot"></span> Skills</a>
+      <a class="nav-link" href="#projects"><span class="nav-dot"></span> Projects</a>
+      <a class="nav-link" href="#experience"><span class="nav-dot"></span> Experience</a>
+      <a class="nav-link" href="#education"><span class="nav-dot"></span> Education</a>
+      <a class="nav-link" href="#contact"><span class="nav-dot"></span> Contact</a>
+    </nav>
+    <div class="sidebar-socials">
+      <a class="social-link" href="#">LinkedIn</a>
+      <a class="social-link" href="#">GitHub</a>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <section id="home">
+      <div>
+        <div class="hero-avatar">👨‍💻</div>
+        <div class="available-badge"><span class="badge-dot"></span> Available for opportunities</div>
+        <h1 class="hero-name">Hi, I'm Dylan Villanueva.</h1>
+        <div class="hero-tagline">I turn data into clear decisions.</div>
+        <div class="hero-btns">
+          <a class="btn-primary" href="#projects">View Projects</a>
+          <a class="btn-outline" href="#">LinkedIn</a>
+          <a class="btn-outline" href="#">View Resume</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="impact">
+      <div class="section-label">By the numbers</div>
+      <div class="section-title">Key Impact</div>
+      <div class="impact-grid">
+        <div class="impact-card"><div class="impact-icon">📊</div><div class="impact-num">3+</div><div class="impact-label">Portfolio Projects Built</div></div>
+        <div class="impact-card"><div class="impact-icon">🗄️</div><div class="impact-num">19+</div><div class="impact-label">SQL Lessons Completed</div></div>
+        <div class="impact-card"><div class="impact-icon">🧹</div><div class="impact-num">2+</div><div class="impact-label">Real Datasets Cleaned</div></div>
+        <div class="impact-card"><div class="impact-icon">💼</div><div class="impact-num">1</div><div class="impact-label">Analytics Internship</div></div>
+      </div>
+    </section>
+
+    <section id="about">
+      <div class="section-label">Introduction</div>
+      <div class="section-title">About</div>
+      <div class="about-text">
+        <p>I'm an analytical and detail-oriented Informatics graduate with a concentration in Data Analytics, focused on landing my first full-time data analyst role.</p>
+        <p>I'm experienced in cleaning, structuring, and analyzing datasets using Excel and SQL to support business decision-making. I have a strong eye for data inconsistencies, and I build reports and visualizations that communicate trends clearly.</p>
+        <p>I'm a strong communicator with the ability to work cross-functionally and manage data with accuracy in fast-paced environments. I'm currently building out my portfolio with SQL-heavy projects and expanding into Python and Tableau.</p>
+      </div>
+    </section>
+
+    <section id="skills">
+      <div class="section-label">Expertise</div>
+      <div class="section-title">Skills</div>
+      <div class="skills-grid">
+        <div class="skill-card">
+          <div class="skill-card-title">Data Analysis & Viz</div>
+          <div class="skill-card-desc">Dashboard design, pivot tables, and visual storytelling that drives decisions.</div>
+          <div class="skill-tags"><span class="tag">SQL</span><span class="tag">Excel</span><span class="tag">Tableau</span><span class="tag">Power BI</span></div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-card-title">Programming & Analytics</div>
+          <div class="skill-card-desc">Statistical analysis, EDA, and reproducible analytical code.</div>
+          <div class="skill-tags"><span class="tag">Python</span><span class="tag">Pandas</span><span class="tag">EDA</span></div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-card-title">Business Analytics</div>
+          <div class="skill-card-desc">Translating data into business recommendations and KPI reporting.</div>
+          <div class="skill-tags"><span class="tag">KPI Tracking</span><span class="tag">Reporting</span><span class="tag">Business Metrics</span></div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-card-title">Data Cleaning & Integrity</div>
+          <div class="skill-card-desc">Identifying inconsistencies, removing duplicates, and structuring raw data.</div>
+          <div class="skill-tags"><span class="tag">Data Cleaning</span><span class="tag">Power Query</span><span class="tag">CSV</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="projects">
+      <div class="section-label">Work</div>
+      <div class="section-title">Projects</div>
+      <div class="projects-grid">
+        <div class="project-card">
+          <div class="project-img" style="background:linear-gradient(135deg,#0f2040,#1a3a6e);">🧠</div>
+          <div class="project-body">
+            <div class="project-tags"><span class="tag">SQL</span><span class="tag">Excel</span><span class="tag">EDA</span></div>
+            <div class="project-title">Boys Mental Health Analysis</div>
+            <div class="project-desc">SQL-driven analysis of boys mental health data. Cleaned and structured the dataset, ran aggregations, and surfaced key trends across demographic groups.</div>
+            <a class="open-repo" href="#">Open Repo</a>
+          </div>
+        </div>
+        <div class="project-card">
+          <div class="project-img" style="background:linear-gradient(135deg,#0f2040,#1a3566);">⚾</div>
+          <div class="project-body">
+            <div class="project-tags"><span class="tag">SQL</span><span class="tag">CTEs</span><span class="tag">Window Functions</span></div>
+            <div class="project-title">Dodgers Competitive Advantage Analysis</div>
+            <div class="project-desc">In-depth SQL analysis of the LA Dodgers' structural advantages in MLB — payroll strategy, farm system depth, deferred compensation, and roster construction.</div>
+            <a class="open-repo" href="#">Coming Soon</a>
+          </div>
+        </div>
+        <div class="project-card">
+          <div class="project-img" style="background:linear-gradient(135deg,#0f2040,#1a3a6e);">📊</div>
+          <div class="project-body">
+            <div class="project-tags"><span class="tag">Excel</span><span class="tag">Pivot Tables</span><span class="tag">Power Query</span></div>
+            <div class="project-title">Walmart Sales Data — Excel Capstone</div>
+            <div class="project-desc">Excel capstone analyzing Walmart sales data. Built pivot tables, charts, and a summary dashboard to surface revenue trends and seasonal patterns.</div>
+            <a class="open-repo" href="#">Coming Soon</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="experience">
+      <div class="section-label">Professional journey</div>
+      <div class="section-title">Experience</div>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-card">
+            <div class="timeline-role">Detailer</div>
+            <div class="timeline-company">Friendly Honda — Poughkeepsie, NY</div>
+            <div class="timeline-date">July 2024 — Present</div>
+            <ul class="timeline-bullets">
+              <li>Coordinate directly with the sales team to provide updates on vehicle readiness and delivery timelines.</li>
+              <li>Track and record detailing supply inventory to support cost control and efficient restocking.</li>
+              <li>Prioritize vehicle preparation based on sales urgency and operational demands.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-card">
+            <div class="timeline-role">EMR Data Reporting Analyst (Intern)</div>
+            <div class="timeline-company">Remote Focus — Brooklyn/Remote, NY</div>
+            <div class="timeline-date">May 2023 — July 2023</div>
+            <ul class="timeline-bullets">
+              <li>Cleaned and validated healthcare software sales datasets to improve reporting accuracy.</li>
+              <li>Exported and structured CSV datasets for reporting and analysis.</li>
+              <li>Assisted in visualizing sales trends using Excel pivot tables and charts.</li>
+              <li>Identified missing and inconsistent records to support improved data integrity.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-card">
+            <div class="timeline-role">Counselor</div>
+            <div class="timeline-company">Deer Mountain Day Camp — Pomona, NY</div>
+            <div class="timeline-date">June 2021 — August 2021</div>
+            <ul class="timeline-bullets">
+              <li>Supervised and mentored teens in structured daily activities.</li>
+              <li>Managed group dynamics and ensured safe, organized activity flow.</li>
+              <li>Developed leadership and strong interpersonal communication skills.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="education">
+      <div class="section-label">Background</div>
+      <div class="section-title">Education</div>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-card">
+            <div class="timeline-role">B.S. Informatics — Concentration in Data Analytics</div>
+            <div class="timeline-company">University at Albany</div>
+            <div class="timeline-date">Graduated May 2025</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-card">
+            <div class="timeline-role">A.A. Criminal Justice</div>
+            <div class="timeline-company">Borough of Manhattan Community College</div>
+            <div class="timeline-date">Graduated May 2022</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-card">
+            <div class="timeline-role">High School Diploma</div>
+            <div class="timeline-company">Cardinal Spellman High School</div>
+            <div class="timeline-date">Graduated June 2020</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="section-label">Get in touch</div>
+      <div class="section-title">Contact</div>
+      <div class="contact-text">I'm currently open to data analyst roles and data-adjacent opportunities. Feel free to reach out.</div>
+      <div class="contact-links">
+        <a class="contact-btn" href="mailto:dvillanueva227@outlook.com">✉ dvillanueva227@outlook.com</a>
+        <a class="contact-btn" href="#">💼 LinkedIn</a>
+        <a class="contact-btn" href="#">🐙 GitHub</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+  for (let i = 0; i < 80; i++) {
+    particles.push({ x: Math.random()*window.innerWidth, y: Math.random()*window.innerHeight, r: Math.random()*1.5+0.5, dx: (Math.random()-0.5)*0.3, dy: (Math.random()-0.5)*0.3, o: Math.random()*0.5+0.2 });
+  }
+  function draw() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(p => {
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(99,179,237,${p.o})`; ctx.fill();
+      p.x+=p.dx; p.y+=p.dy;
+      if(p.x<0||p.x>canvas.width) p.dx*=-1;
+      if(p.y<0||p.y>canvas.height) p.dy*=-1;
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
+      const target = document.querySelector(link.getAttribute('href'));
+      if(target) target.scrollIntoView({behavior:'smooth'});
+    });
+  });
+</script>
+
+</body>
+</html>
